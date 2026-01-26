@@ -30,6 +30,7 @@ jobs:
         run: |
           # Installing the NEW Google Gen AI SDK (v1.0+)
           python -m pip install google-genai google-api-core pypi-simple packaging pip-tools
+          python -m pip install --upgrade pip setuptools wheel
 
       # --- 1. THE CONTROL GROUP (Safety Check) ---
       # --- 1. THE CONTROL GROUP (Safety Check) ---
@@ -44,8 +45,6 @@ jobs:
           python -m venv baseline_env
           source baseline_env/bin/activate
           
-          # 1. Install SAFE requirements (Gym 0.23.1)
-          # No manual hacks needed anymore!
           pip install -r requirements.txt
           
           # 2. Install the Project
