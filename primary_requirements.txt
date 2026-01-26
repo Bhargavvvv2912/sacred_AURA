@@ -1,0 +1,13 @@
+docopt-ng
+jsonpickle
+munch
+wrapt
+py-cpuinfo
+colorama
+packaging
+GitPython
+numpy
+pandas
+matplotlib
+pyyaml
+pymongo
