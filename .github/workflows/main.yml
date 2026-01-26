@@ -32,61 +32,28 @@ jobs:
           python -m pip install google-genai google-api-core pypi-simple packaging pip-tools
           python -m pip install --upgrade pip setuptools wheel
 
-      # --- 1. THE CONTROL GROUP (Safety Check) ---
-      # --- 1. THE CONTROL GROUP (Safety Check) ---
-      - name: 🧪 1. Run Pip Baseline (Initial State)
-        id: pip_initial
-        continue-on-error: false
+      - name: 🧪 1. Run Pip Baseline
         run: |
-          echo "========================================"
-          echo "STEP 1: Verify Initial Pinned Requirements"
-          echo "========================================"
-          
           python -m venv baseline_env
           source baseline_env/bin/activate
-          
+          # Use setuptools < 60 to avoid the 'strip_trailing_zero' crash
+          pip install "setuptools<60" wheel 
           pip install -r requirements.txt
-          
-          # 2. Install the Project
           pip install -e .
-          
-          echo "--> Running Validation on Safe State..."
           python validation_sacred.py
-          
-          echo "RESULT: INITIAL STATE IS VALID ✅"
           deactivate
-          rm -rf baseline_env
 
-      # --- 2. THE ATTACK (Simulate 'Pip Upgrade') ---
-      - name: 💥 2. Run Pip Upgrade (The Breakage Test)
-        id: pip_upgrade
-        continue-on-error: true # We EXPECT this to fail!
+      - name: 💥 2. Run Pip Upgrade
+        continue-on-error: true
         run: |
-          echo "========================================"
-          echo "STEP 2: Simulate Blind Pip Upgrade"
-          echo "========================================"
-          
           python -m venv upgrade_env
           source upgrade_env/bin/activate
-          
-          # 1. Force Upgrade everything (The Trap)
-          # This should install Gym 0.26+ which breaks the API
-          echo "--> Running 'pip install --upgrade -r requirements.txt'..."
+          pip install "setuptools<60" wheel
+          # Attack: Blind upgrade all dependencies
           pip install --upgrade -r primary_requirements.txt
-          
-          # 2. Re-install project to link new libs
           pip install -e .
-          
-          echo "--> Running Validation on Upgraded State..."
-          # This script checks for 4 return values. Gym 0.26 returns 5.
-          # THIS SHOULD CRASH.
           python validation_sacred.py
-          
-          # If we get here, Pip accidentally worked (Bad for experiment)
-          echo "RESULT: PIP UPGRADE PASSED (Unexpected?)"
           deactivate
-          rm -rf upgrade_env
-
       # --- 3. THE DEFENSE (AURA) ---
       - name: 🤖 3. Run AURA Agent
         # -u forces logs to print immediately
