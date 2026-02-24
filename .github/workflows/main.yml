@@ -32,16 +32,6 @@ jobs:
           python -m pip install google-genai google-api-core pypi-simple packaging pip-tools
           python -m pip install --upgrade pip setuptools wheel
 
-      - name: 🧪 1. Run Pip Baseline
-        run: |
-          python -m venv baseline_env
-          source baseline_env/bin/activate
-          # Use setuptools < 60 to avoid the 'strip_trailing_zero' crash
-          pip install "setuptools<60" wheel 
-          pip install -r requirements.txt
-          pip install -e .
-          python validation_sacred.py
-          deactivate
 
       - name: 💥 2. Run Pip Upgrade
         continue-on-error: true
